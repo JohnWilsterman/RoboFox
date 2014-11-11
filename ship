@@ -1,0 +1,137 @@
+class Ship
+{
+  PVector vertices[][] = new PVector[2][5];
+
+  PVector path[] = new PVector[500]; 
+
+  float pathX;
+  float pathY;
+  float pathZ;
+  int pathCount;
+
+
+  float angle = 0;
+  int pts = 4;
+  float cylinderLength = 95;
+  float radius = 50;
+  float angleInc;
+
+  PVector loc = new PVector(0, 0, 0);
+  PVector vel = new PVector(0, 0, 0);
+  PVector acc = new PVector(0, 0, 0); 
+  int hue;
+  int place;
+
+  int smokeT = 50;
+  float smokeP = 0;
+
+
+  Ship(int count) {
+
+    this.loc.x = cos(count) * 300;
+    this.loc.z = sin(count) * 300;   
+    hue = 62 + (count * 60);
+    angleInc = 0;
+    place = count;
+
+
+    for (int i = 0; i < 2; i++) {
+      angle = (frameCount % 360);
+      for (int j = 0; j <= pts; j++) {
+        vertices[i][j] = new PVector();
+        if (i==1) {
+          vertices[i][j].x = 0;
+          vertices[i][j].y = 0;
+        } else {
+          vertices[i][j].x = (cos(radians(angle)) * radius);
+          vertices[i][j].y = (sin(radians(angle)) * radius);
+        }
+
+        vertices[i][j].z = cylinderLength; 
+        // the .0 after the 360 is critical
+        angle += 360.0/pts;
+      }
+      cylinderLength *= -1;
+    }
+
+    for (int k = 0; k < path.length; k++) {
+      pathX =  width/2 + loc.x ;
+      pathY =  height/2 + (k*10); 
+      pathZ =  loc.z ;
+
+      path[k] = new PVector(pathX, pathY, pathZ);
+    }
+  }
+
+  void displayShip() {
+
+    noStroke();
+    pushMatrix();
+    translate(width/2 + loc.x, (height/2 - cylinderLength), loc.z);
+    rotateX(radians(-90));
+    rotateZ(radians(45));
+    beginShape(QUAD_STRIP);
+    for (int j = 0; j <= 4; j++) {
+      fill(hue, 100, 100);
+      vertex(vertices[0][j].x, vertices[0][j].y, vertices[0][j].z);
+      fill(hue, 100, 100);
+      vertex(vertices[1][j].x, vertices[1][j].y, vertices[1][j].z);
+    }
+    endShape();
+    for (int i = 0; i < 2; i++) {
+      beginShape();
+      for (int j = 0; j < pts; j++) {
+        vertex(vertices[i][j].x, vertices[i][j].y, vertices[i][j].z);
+      }
+      endShape(CLOSE);
+    }
+
+    popMatrix();
+    pushMatrix();
+    fill(hue-50, 100, 100);
+    translate(width/2 + loc.x, (height/2)-(cylinderLength /3), loc.z + 25);
+    box(50, 40, 20);  //cockpit
+    popMatrix();
+    pushMatrix();
+    fill(62, 0, 21);
+    translate(width/2 + loc.x - (radius-20), (height/2), loc.z);
+    box(20, 50, 20);   //engine 1
+
+    popMatrix();
+
+
+    for (int i = 0; i < smokeT; i++) {
+      pushMatrix();
+      fill(hue-50 + random(0, 20), 100, 100);
+      smokeP = random(0, 200);
+      translate(width/2 + loc.x - (radius-20)+(random(-1, 1) * smokeP / 10), (height/2)+smokeP, loc.z +(random(-1, 1) * smokeP / 5) );
+      box(10, 10, 10);
+      popMatrix();
+    } 
+    fill(62, 5, 63, 40);
+
+    pushMatrix();
+    translate(width/2 + loc.x + (radius-20), (height/2), loc.z);
+    fill(62, 0, 21);
+    box(20, 50, 20);
+    popMatrix();
+    fill(hue-50 + random(0, 20), 100, 100);
+    for (int i = 0; i < smokeT; i++) {
+      pushMatrix();
+      fill(hue-50 + random(0, 20), 100, 100);
+      smokeP = random(0, 200);
+      translate(width/2 + loc.x + (radius-20)+(random(-1, 1) * smokeP / 10), (height/2)+smokeP, loc.z +(random(-1, 1) * smokeP / 5) );
+      box(10, 10, 10);
+      popMatrix();
+    }
+
+    for (int m = 0; m < path.length; m++) {
+      if (m > 0) { 
+        strokeWeight(10);
+        stroke(hue, 100, 100, 200 - m);
+        line(path[m].x, path[m].y, path[m].z+ sin(m - frameCount %100)* m /2, path[m-1].x, path[m-1].y, path[m-1].z+ sin(m-1 - frameCount %100)  * m/2);
+      } else {
+      }
+    }
+  }
+}
