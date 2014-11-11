@@ -1,0 +1,40 @@
+import peasy.*;
+
+PeasyCam cam;
+int count = 6;
+
+Ship[] ships = new Ship[6];
+
+
+
+void setup() {
+  size(displayWidth, displayHeight, P3D);
+  colorMode(HSB, 355, 100, 100);
+  smooth(3);
+
+  cam = new PeasyCam(this, width/2, height/2, 0, 1000);
+  cam.setMinimumDistance(50);
+  cam.setMaximumDistance(2000);
+  
+  for(int i = 0; i < count; i++){
+    
+    ships[i] = new Ship(i);
+    
+    
+    
+  }
+  
+  
+}
+void draw() {
+  background(248,57,10);
+  
+  lights();
+  
+  
+  for(int i = 0; i < count; i++){
+    
+   ships[i].displayShip(); 
+    
+  }
+}
